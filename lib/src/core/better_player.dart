@@ -68,6 +68,9 @@ class BetterPlayerState extends State<BetterPlayer> {
 
   void _setup() async {
     widget.controller.addListener(onFullScreenChanged);
+
+    // force wakelock
+    Wakelock.enable();
   }
 
   @override
@@ -182,7 +185,7 @@ class BetterPlayerState extends State<BetterPlayer> {
 
     // The wakelock plugins checks whether it needs to perform an action internally,
     // so we do not need to check Wakelock.isEnabled.
-    Wakelock.disable();
+    // Wakelock.disable();
 
     SystemChrome.setEnabledSystemUIOverlays(
         widget.controller.systemOverlaysAfterFullScreen);
