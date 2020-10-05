@@ -5,6 +5,9 @@ class BetterPlayerDataSource {
   ///Type of source of video
   final BetterPlayerDataSourceType type;
 
+  ///Title of the video
+  final String title;
+
   ///Url of the video
   final String url;
 
@@ -35,6 +38,7 @@ class BetterPlayerDataSource {
 
   BetterPlayerDataSource(
     this.type,
+    this.title,
     this.url, {
     this.subtitles,
     this.liveStream = false,
@@ -47,12 +51,13 @@ class BetterPlayerDataSource {
 
   @override
   String toString() {
-    return 'BetterPlayerDataSource{type: $type, url: $url, subtitles: $subtitles,'
+    return 'BetterPlayerDataSource{type: $type, title: $title, url: $url, subtitles: $subtitles,'
         ' liveStream: $liveStream, headers: $headers, useHlsSubtitles: $useHlsSubtitles}';
   }
 
   BetterPlayerDataSource copyWith(
       {BetterPlayerDataSourceType type,
+      String title,
       String url,
       List<BetterPlayerSubtitlesSource> subtitles,
       bool liveStream,
@@ -62,6 +67,7 @@ class BetterPlayerDataSource {
       Map<String, String> qualities}) {
     return BetterPlayerDataSource(
       type ?? this.type,
+      title ?? this.title,
       url ?? this.url,
       subtitles: subtitles ?? this.subtitles,
       liveStream: liveStream ?? this.liveStream,

@@ -23,26 +23,28 @@ class BetterPlayer extends StatefulWidget {
         super(key: key);
 
   factory BetterPlayer.network(
+    String title,
     String url, {
     BetterPlayerConfiguration betterPlayerConfiguration,
   }) =>
       BetterPlayer(
         controller: BetterPlayerController(
           betterPlayerConfiguration ?? BetterPlayerConfiguration(),
-          betterPlayerDataSource:
-              BetterPlayerDataSource(BetterPlayerDataSourceType.NETWORK, url),
+          betterPlayerDataSource: BetterPlayerDataSource(
+              BetterPlayerDataSourceType.NETWORK, title, url),
         ),
       );
 
   factory BetterPlayer.file(
+    String title,
     String url, {
     BetterPlayerConfiguration betterPlayerConfiguration,
   }) =>
       BetterPlayer(
         controller: BetterPlayerController(
           betterPlayerConfiguration ?? BetterPlayerConfiguration(),
-          betterPlayerDataSource:
-              BetterPlayerDataSource(BetterPlayerDataSourceType.FILE, url),
+          betterPlayerDataSource: BetterPlayerDataSource(
+              BetterPlayerDataSourceType.FILE, title, url),
         ),
       );
 

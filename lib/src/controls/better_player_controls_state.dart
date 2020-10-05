@@ -4,16 +4,169 @@ import 'package:better_player/src/core/better_player_utils.dart';
 import 'package:better_player/src/hls/better_player_hls_track.dart';
 import 'package:better_player/src/video_player/video_player.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_fling/flutter_fling.dart';
+import 'package:flutter_fling/remote_media_player.dart';
+import 'package:flutter/services.dart' show PlatformException;
 
 ///Base class for both material and cupertino controls
 abstract class BetterPlayerControlsState<T extends StatefulWidget>
     extends State<T> {
+  List<RemoteMediaPlayer> _flingDevices;
+  RemoteMediaPlayer _selectedPlayer;
+  FlutterFling fling;
+
+  getCastDevices() async {
+    await FlutterFling.startDiscoveryController((status, player) {
+      _flingDevices = List();
+      if (status == PlayerDiscoveryStatus.Found) {
+        setState(() {
+          _flingDevices.add(player);
+        });
+      } else {
+        setState(() {
+          _flingDevices.remove(player);
+        });
+      }
+    });
+  }
+
+  getSelectedDevice() async {
+    RemoteMediaPlayer selectedDevice;
+    try {
+      selectedDevice = await FlutterFling.selectedPlayer;
+    } on PlatformException {
+      print('Failed to get selected device');
+    }
+    setState(() {
+      _selectedPlayer = selectedDevice;
+    });
+  }
+
+  castMediaTo(RemoteMediaPlayer player) async {
+    _selectedPlayer = player;
+    await FlutterFling.play((state, condition, position) {},
+            player: _selectedPlayer,
+            mediaUri:
+                await getBetterPlayerController().betterPlayerDataSource.url,
+            mediaTitle:
+                await getBetterPlayerController().betterPlayerDataSource.title)
+        .then((_) => getSelectedDevice());
+  }
+
+  void _cast() async {
+    fling = FlutterFling();
+    await getSelectedDevice();
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          top: false,
+          bottom: true,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                _flingDevices == null
+                    ? const Text(
+                        'Search to begin then tap on device name to cast')
+                    : _flingDevices.isEmpty
+                        ? const Text('None nearby')
+                        : ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: _flingDevices.length,
+                            itemBuilder: (context, index) {
+                              return ListTile(
+                                title: Text(_flingDevices[index].name),
+                                subtitle: Text(_flingDevices[index].uid),
+                                onTap: () => castMediaTo(_flingDevices[index]),
+                              );
+                            },
+                          ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    // RaisedButton(
+                    //   child: Text('Search'),
+                    //   onPressed: () => await getCastDevices(),
+                    // ),
+                    // RaisedButton(
+                    //   child: Text('Dispose Controller'),
+                    //   onPressed: () async {
+                    //     await FlutterFling.stopDiscoveryController();
+                    //     setState(() {
+                    //       _flingDevices = List();
+                    //       _selectedPlayer = null;
+                    //     });
+                    //   },
+                    // ),
+                    Row(
+                      children: [
+                        FlatButton(
+                          child: const Icon(Icons.fast_rewind),
+                          onPressed: () async =>
+                              await FlutterFling.seekBackPlayer(),
+                        ),
+                        FlatButton(
+                          child: const Icon(Icons.play_arrow),
+                          onPressed: () async =>
+                              await FlutterFling.playPlayer(),
+                        ),
+                        FlatButton(
+                          child: const Icon(Icons.fast_forward),
+                          onPressed: () async =>
+                              await FlutterFling.seekForwardPlayer(),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        FlatButton(
+                          child: const Icon(Icons.volume_mute),
+                          onPressed: () async =>
+                              await FlutterFling.mutePlayer(true),
+                        ),
+                        FlatButton(
+                          child: const Icon(Icons.pause),
+                          onPressed: () async =>
+                              await FlutterFling.pausePlayer(),
+                        ),
+                        FlatButton(
+                          child: const Icon(Icons.stop),
+                          onPressed: () async {
+                            await FlutterFling.stopPlayer();
+                            setState(() {
+                              // keep device until disposed
+                              // _flingDevices = null;
+                            });
+                          },
+                        ),
+                        FlatButton(
+                          child: const Icon(Icons.volume_up),
+                          onPressed: () async =>
+                              await FlutterFling.mutePlayer(false),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   ///Min. time of buffered video to hide loading timer (in milliseconds)
   static const int _bufferingInterval = 20000;
 
   BetterPlayerController getBetterPlayerController();
 
-  void onShowMoreClicked() {
+  void onShowMoreClicked() async {
+    await getCastDevices(); // start discovery on load
+
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -46,9 +199,10 @@ abstract class BetterPlayerControlsState<T extends StatefulWidget>
                 _showSubtitlesSelectionWidget();
               }),
             if (controlsConfiguration.enableQualities)
-              _buildMoreOptionsListRow(Icons.hd, "Quality", () {
+              _buildMoreOptionsListRow(Icons.cast, "Cast", () {
                 Navigator.of(context).pop();
-                _showQualitiesSelectionWidget();
+                // _showQualitiesSelectionWidget();
+                _cast();
               }),
           ],
         ),
