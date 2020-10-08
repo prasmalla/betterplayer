@@ -50,16 +50,16 @@ class _MainPageState extends State<MainPage> {
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.business_center),
-            title: Text(pageTitles[0]),
+            icon: const Icon(Icons.business_center),
+            label: pageTitles[0],
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.business),
-            title: Text(pageTitles[1]),
+            icon: const Icon(Icons.business),
+            label: pageTitles[1],
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            title: Text(pageTitles[2]),
+            icon: const Icon(Icons.home),
+            label: pageTitles[2],
           ),
         ],
         currentIndex: _selectedIndex,

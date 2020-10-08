@@ -13,6 +13,7 @@ class _OtherPageState extends State<OtherPage> {
   void initState() {
     var dataSource = BetterPlayerDataSource(
       BetterPlayerDataSourceType.NETWORK,
+      "Default Title",
       "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
       subtitles: BetterPlayerSubtitlesSource.single(
         type: BetterPlayerSubtitlesSourceType.NETWORK,
@@ -43,6 +44,7 @@ class _OtherPageState extends State<OtherPage> {
       body: AspectRatio(
         aspectRatio: 16 / 9,
         child: BetterPlayer.network(
+          "Default Title",
           "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
           betterPlayerConfiguration: BetterPlayerConfiguration(
             aspectRatio: 16 / 9,

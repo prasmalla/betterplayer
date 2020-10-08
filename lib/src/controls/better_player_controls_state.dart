@@ -44,12 +44,16 @@ abstract class BetterPlayerControlsState<T extends StatefulWidget>
 
   castMediaTo(RemoteMediaPlayer player) async {
     _selectedPlayer = player;
+    // fireTV has no ts support
+    String url = getBetterPlayerController().betterPlayerDataSource.url;
+    if (url.contains('.ts')) {
+      url = url.replaceAll('.ts', '.m3u8');
+    }
     await FlutterFling.play((state, condition, position) {},
             player: _selectedPlayer,
-            mediaUri:
-                await getBetterPlayerController().betterPlayerDataSource.url,
+            mediaUri: url,
             mediaTitle:
-                await getBetterPlayerController().betterPlayerDataSource.title)
+                getBetterPlayerController().betterPlayerDataSource.title)
         .then((_) => getSelectedDevice());
   }
 
@@ -171,7 +175,7 @@ abstract class BetterPlayerControlsState<T extends StatefulWidget>
       context: context,
       builder: (context) {
         return SafeArea(
-          top: false,
+          top: true,
           bottom: true,
           child: _buildMoreOptionsList(),
         );

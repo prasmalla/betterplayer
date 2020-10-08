@@ -23,7 +23,9 @@ class _GeneralPageState extends State<GeneralPage> {
   bool _fileVideoShown = false;
 
   Future<BetterPlayerController> _setupDefaultVideoData() async {
-    var dataSource = BetterPlayerDataSource(BetterPlayerDataSourceType.NETWORK,
+    var dataSource = BetterPlayerDataSource(
+        BetterPlayerDataSourceType.NETWORK,
+        "Default Title",
         "https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_480_1_5MG.mp4",
         resolutions: {
           "LOW":
@@ -57,6 +59,7 @@ class _GeneralPageState extends State<GeneralPage> {
 
     var dataSource = BetterPlayerDataSource(
       BetterPlayerDataSourceType.FILE,
+      "Test Video",
       "${directory.path}/testvideo.mp4",
       subtitles: BetterPlayerSubtitlesSource.single(
         type: BetterPlayerSubtitlesSourceType.FILE,
